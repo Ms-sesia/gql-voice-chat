@@ -30,9 +30,14 @@ const PORT = process.env.SERVER_PORT;
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
 
-  app.use(helmet());
   app.use(cors());
-
+  
+  app.get("/api/upload", (req, res) => {
+    res.render("upload");
+  });
+  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); // 이벤트, 쿠폰 등 기타이미지
+  
+  app.use(helmet());
   app.use(
     csp({
       useDefaults: true,
@@ -49,16 +54,9 @@ const PORT = process.env.SERVER_PORT;
 
   app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
-  app.use(helmet());
-
   app.set("views", "./src/viewFiles");
   app.set("view engine", "pug");
 
-  app.get("/api/upload", (req, res) => {
-    res.render("upload");
-  });
-
-  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); // 이벤트, 쿠폰 등 기타이미지
   // app.get("/", (req, res) => {
   //   res.send("Hello Express.");
   // });
