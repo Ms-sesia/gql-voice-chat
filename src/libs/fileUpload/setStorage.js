@@ -14,7 +14,6 @@ export default (subject) => {
       cb(null, diskPath);
     },
     filename: (req, file, cb) => {
-      console.log("setStorage file info: ", file);
       cb(null, Date.now() + "-" + file.originalname);
     },
   });

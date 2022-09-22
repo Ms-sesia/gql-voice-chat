@@ -30,24 +30,26 @@ const PORT = process.env.SERVER_PORT;
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
 
+  app.use(helmet());
   app.use(cors());
 
   app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          styleSrcElem: ["'self'", "fonts.googleapis.com", "cdn.jsdelivr.net", "'unsafe-inline'"],
-          imgSrc: ["'self'", "cdn.jsdelivr.net"],
-          scriptSrcElem: ["'self'", "cdn.jsdelivr.net", "'unsafe-inline'"],
-          fontSrc: ["'self'", "'unsafe-inline'", "fonts.gstatic.com"],
-        },
+    csp({
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        styleSrcElem: ["'self'", "fonts.googleapis.com", "cdn.jsdelivr.net", "'unsafe-inline'"],
+        imgSrc: ["'self'", "cdn.jsdelivr.net"],
+        scriptSrcElem: ["'self'", "cdn.jsdelivr.net", "'unsafe-inline'"],
+        fontSrc: ["'self'", "'unsafe-inline'", "fonts.gstatic.com"],
       },
     })
   );
 
   app.get("/", expressPlayground({ endpoint: "/graphql" }));
+
+  app.use(helmet());
 
   app.set("views", "./src/viewFiles");
   app.set("view engine", "pug");
@@ -56,7 +58,7 @@ const PORT = process.env.SERVER_PORT;
     res.render("upload");
   });
 
-  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController);
+  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); // 이벤트, 쿠폰 등 기타이미지
   // app.get("/", (req, res) => {
   //   res.send("Hello Express.");
   // });

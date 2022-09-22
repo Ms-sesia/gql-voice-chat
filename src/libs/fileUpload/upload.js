@@ -14,7 +14,6 @@ export const upload = (req, res, next) => {
   const upload = multer({ storage: storage }).array("file");
   upload(req, res, (err) => {
     if (err) {
-      console.log("uload error:", err);
       return res.status(500).json(err);
     }
     next();
@@ -24,7 +23,6 @@ export const upload = (req, res, next) => {
 export const uploadController = async (req, res) => {
   const { files } = req;
   const location = [];
-  console.log("files information : ", files);
   for (let i = 0; i < files.length; i++) location.push(process.env.LOCALSTORAGEADDR + files[i].filename);
   return res.status(200).json(location);
 };
