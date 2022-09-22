@@ -22,27 +22,32 @@ const PORT = process.env.SERVER_PORT;
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: ({ req: request }) => ({ request, isAuthenticated }),
+    // context: ({ req: request }) => ({ request, isAuthenticated }),
+    context: ({ req: request }) => ({ request }),
   });
 
   await server.start();
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
 
+  app.use(cors());
+
   app.use(
-    csp({
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        styleSrcElem: ["'self'", "fonts.googleapis.com", "cdn.jsdelivr.net", "'unsafe-inline'"],
-        imgSrc: ["'self'", "cdn.jsdelivr.net"],
-        scriptSrcElem: ["'self'", "cdn.jsdelivr.net", "'unsafe-inline'"],
-        fontSrc: ["'self'", "'unsafe-inline'", "fonts.gstatic.com"],
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          styleSrcElem: ["'self'", "fonts.googleapis.com", "cdn.jsdelivr.net", "'unsafe-inline'"],
+          imgSrc: ["'self'", "cdn.jsdelivr.net"],
+          scriptSrcElem: ["'self'", "cdn.jsdelivr.net", "'unsafe-inline'"],
+          fontSrc: ["'self'", "'unsafe-inline'", "fonts.gstatic.com"],
+        },
       },
     })
   );
 
-  // app.get("/", expressPlayground({ endpoint: "/graphql" }));
+  app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
   app.set("views", "./src/viewFiles");
   app.set("view engine", "pug");
@@ -51,13 +56,10 @@ const PORT = process.env.SERVER_PORT;
     res.render("upload");
   });
 
-  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); // 이벤트, 쿠폰 등 기타이미지
-  app.get("/", (req, res) => {
-    res.send("Hello Express.");
-  });
-
-  app.use(helmet());
-  app.use(cors());
+  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController);
+  // app.get("/", (req, res) => {
+  //   res.send("Hello Express.");
+  // });
 
   server.applyMiddleware({ app });
 
