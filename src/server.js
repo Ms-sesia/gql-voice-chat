@@ -57,10 +57,6 @@ const PORT = process.env.SERVER_PORT;
   app.set("views", "./src/viewFiles");
   app.set("view engine", "pug");
 
-  // app.get("/", (req, res) => {
-  //   res.send("Hello Express.");
-  // });
-
   server.applyMiddleware({ app });
 
   await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
