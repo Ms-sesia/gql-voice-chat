@@ -1,3 +1,0 @@
-type Mutation {
-  mutationTest(year: Int, month: Int): Boolean
-}

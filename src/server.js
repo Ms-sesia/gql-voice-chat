@@ -6,7 +6,8 @@ import schema from "./schema";
 import cors from "cors";
 import helmet from "helmet";
 import csp from "helmet-csp";
-import { upload, uploadController, uploadSet } from "./libs/fileUpload/upload";
+import graphqlUploadExpress from "./libs/graphql_fileUpload/graphqlUploadExpress";
+// import { upload, uploadController, uploadSet } from "./libs/fileUpload/upload";
 import http from "http";
 import dotenv from "dotenv";
 dotenv.config();
@@ -22,7 +23,7 @@ const PORT = process.env.SERVER_PORT;
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    // context: ({ req: request }) => ({ request, isAuthenticated }),
+    // context: ({ req: request }) => ({ request, isAuthenticated }), // isAuthenticated는 유저 인증시 필요
     context: ({ req: request }) => ({ request }),
   });
 
@@ -30,13 +31,10 @@ const PORT = process.env.SERVER_PORT;
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
 
+  app.use(graphqlUploadExpress());
+
   app.use(cors());
-  
-  app.get("/api/upload", (req, res) => {
-    res.render("upload");
-  });
-  app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); // 이벤트, 쿠폰 등 기타이미지
-  
+
   app.use(helmet());
   app.use(
     csp({
@@ -54,8 +52,16 @@ const PORT = process.env.SERVER_PORT;
 
   app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
-  app.set("views", "./src/viewFiles");
-  app.set("view engine", "pug");
+  // gql 이용시 multer사용하지 않고 gql로 사용
+  /*
+    app.get("/api/upload", (req, res) => {
+      res.render("upload");
+    });
+    app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); 
+  
+    app.set("views", "./src/viewFiles");
+    app.set("view engine", "pug");
+    */
 
   server.applyMiddleware({ app });
 
