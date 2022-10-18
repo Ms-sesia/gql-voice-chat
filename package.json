@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node ./src/server.js",
-    "test": "nodemon --exec babel-node ./src/testServer.js"
+    "test": "nodemon --exec babel-node ./src/testServer.js",
+    "generate": "npx prisma migrate dev --name init",
+    "studio": "npx prisma studio",
+    "build": "cp -rvf src/* build/; babel src -d build"
   },
   "keywords": [],
   "author": "",

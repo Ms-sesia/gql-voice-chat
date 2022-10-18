@@ -35,6 +35,8 @@ const PORT = process.env.SERVER_PORT;
 
   app.use(cors());
 
+  app.get("/", expressPlayground({ endpoint: "/graphql" }));
+
   app.use(helmet());
   app.use(
     csp({
@@ -49,8 +51,6 @@ const PORT = process.env.SERVER_PORT;
       },
     })
   );
-
-  app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
   // gql 이용시 multer사용하지 않고 gql로 사용
   /*
