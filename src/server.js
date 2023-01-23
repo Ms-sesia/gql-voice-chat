@@ -12,6 +12,7 @@ import http from "http";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
+import socket from "./libs/socket";
 
 const PORT = process.env.SERVER_PORT;
 
@@ -20,22 +21,28 @@ const PORT = process.env.SERVER_PORT;
 
   const httpServer = http.createServer(app);
 
-  const server = new ApolloServer({
+  const apolloServer = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     // context: ({ req: request }) => ({ request, isAuthenticated }), // isAuthenticated는 유저 인증시 필요
     context: ({ req: request }) => ({ request }),
   });
 
-  await server.start();
+  await apolloServer.start();
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
 
   app.use(graphqlUploadExpress());
 
   app.use(cors());
+  // app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
-  app.get("/", expressPlayground({ endpoint: "/graphql" }));
+  app.set("views", "./src/viewFiles");
+  app.set("view engine", "pug");
+
+  app.get("/", (req, res, next) => {
+    res.render("index");
+  });
 
   app.use(helmet());
   app.use(
@@ -51,7 +58,6 @@ const PORT = process.env.SERVER_PORT;
       },
     })
   );
-
   // gql 이용시 multer사용하지 않고 gql로 사용
   /*
     app.get("/api/upload", (req, res) => {
@@ -59,12 +65,15 @@ const PORT = process.env.SERVER_PORT;
     });
     app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); 
   
-    app.set("views", "./src/viewFiles");
-    app.set("view engine", "pug");
     */
 
-  server.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app });
 
-  await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
-  console.log(`Server ready at http://localhost:${PORT}`);
+  // const startServer = await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
+  // console.log(`Server ready at http://localhost:${PORT}`);
+  const server = app.listen(PORT, () => {
+    console.log(`Server ready at http://localhost:${PORT}`);
+  });
+
+  socket(server);
 })();

@@ -14,9 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/busboy": "^1.5.0",
-    "@types/node": "*",
-    "@types/object-path": "^0.11.1",
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.19.3",
     "@babel/node": "^7.19.1",
@@ -26,6 +23,9 @@
     "@graphql-tools/merge": "^8.3.6",
     "@graphql-tools/schema": "^9.0.4",
     "@prisma/client": "^4.4.0",
+    "@types/busboy": "^1.5.0",
+    "@types/node": "*",
+    "@types/object-path": "^0.11.1",
     "apollo-server-core": "^3.10.3",
     "apollo-server-express": "^3.10.3",
     "busboy": "^1.6.0",
@@ -44,6 +44,7 @@
     "nodemon": "^2.0.20",
     "object-path": "^0.11.8",
     "path": "^0.12.7",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "socket.io": "^4.5.4"
   }
 }
