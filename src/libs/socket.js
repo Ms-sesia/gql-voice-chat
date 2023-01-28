@@ -1,29 +1,63 @@
-import io from "socket.io";
+// export default {
+//   Query: {
+//     socket: async (_, args, { request }) => {
+//       const io = request.app.get("io");
+//       console.log
+//       io.on("connection", (socket) => {
+//         const userId = socket.id;
+//         console.log(userId);
+//       });
+//     },
+//   },
+// };
+
+import socketIO from "socket.io";
+import genRandomString from "./genRandomString";
 
 export default async (server) => {
-  const socket = io(server, { path: "/socket.io" });
+  const roomName = genRandomString();
+  
+  const io = socketIO(server, { path: "/socket.io" });
 
-  let dataTest = "";
+  io.on("connection", (socket) => {
+    // 시리얼이 있으면 발신자. 발신자는 socket.id 사용
+    // const userId = serial ? socket.id : receiverId;
+    const userId = socket.id;
+    console.log(userId);
 
-  socket.on("connection", (socket) => {
-    const req = socket.request;
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddres;
-    console.log(req);
-    console.log("새로들어온 클라이언트 접속!", ip, socket.id, req.ip);
-    socket.on("disconnect", () => {
-      console.log("클라이언트 접속 해제", ip, socket.id);
-      clearInterval(socket.interval);
+    socket.emit("getRoomName", (roomName) => {
+      console.log(roomName);
     });
-    socket.on("error", (error) => {
-      console.log("에러:", error);
+
+    socket.on("join_room", (roomName) => {
+      console.log("룸에입장하였습니다.");
+      socket.join(roomName);
+      socket.to(roomName).emit("welcome");
     });
-    socket.on("reply", (data) => {
-      console.log("reply 데이터:", data);
-      dataTest = "새로 데이터를 만들었습니다.";
-      console.log("새로 생성한 dataTest:", dataTest);
+
+    // console.log(joinRoom);
+
+    socket.on("offer", (offer, roomName) => {
+      socket.to(roomName).emit("offer", offer);
     });
-    socket.emit("news", "Hello socket.io");
-    // socket.interval = setInterval(() => {
-    // }, 3000);
+    socket.on("answer", (answer, roomName) => {
+      socket.to(roomName).emit("answer", answer);
+    });
+    socket.on("ice", (ice, roomName) => {
+      socket.to(roomName).emit("ice", ice);
+    });
+
+    socket.on("sendCall", (roomName) => {
+      socket.to(roomName).emit("receiveCall");
+    });
+
+    socket.on("received", (roomName) => {
+      socket.to(roomName).emit("received");
+    });
+
+    socket.on("end", (roomName) => {
+      socket.to(roomName).emit("close");
+      socket.in(roomName).disconnectSockets(true);
+    });
   });
 };

@@ -7,11 +7,11 @@ import cors from "cors";
 import helmet from "helmet";
 import csp from "helmet-csp";
 import graphqlUploadExpress from "./libs/graphql_fileUpload/graphqlUploadExpress";
-// import { upload, uploadController, uploadSet } from "./libs/fileUpload/upload";
 import http from "http";
 import dotenv from "dotenv";
 dotenv.config();
 import path from "path";
+// import socketIO from "socket.io";
 import socket from "./libs/socket";
 
 const PORT = process.env.SERVER_PORT;
@@ -31,14 +31,24 @@ const PORT = process.env.SERVER_PORT;
   await apolloServer.start();
 
   app.use(express.static(path.join(__dirname, "../", "Images")));
+  app.use("/public", express.static(path.join(__dirname, "viewFiles", "public")));
 
   app.use(graphqlUploadExpress());
 
   app.use(cors());
-  // app.get("/", expressPlayground({ endpoint: "/graphql" }));
+  app.get("/", expressPlayground({ endpoint: "/graphql" }));
 
-  app.set("views", "./src/viewFiles");
   app.set("view engine", "pug");
+  // app.set("views", __dirname + "/views");
+  app.set("views", "./src/viewFiles");
+  // const io = socketIO(server, { path: "/socket.io" });
+  // app.set("io", io);
+  // app.get("/server", (req, res, next) => socket(req, res, next));
+
+  app.get("/voice", (_, res) => res.render("home"));
+  app.get("/*", (_, res) => res.redirect("/voice"));
+
+  // app.set("view engine", "pug");
 
   app.get("/", (req, res, next) => {
     res.render("index");
@@ -58,19 +68,9 @@ const PORT = process.env.SERVER_PORT;
       },
     })
   );
-  // gql 이용시 multer사용하지 않고 gql로 사용
-  /*
-    app.get("/api/upload", (req, res) => {
-      res.render("upload");
-    });
-    app.post("/api/uploadTest", uploadSet("uploadTest"), upload, uploadController); 
-  
-    */
 
   apolloServer.applyMiddleware({ app });
 
-  // const startServer = await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
-  // console.log(`Server ready at http://localhost:${PORT}`);
   const server = app.listen(PORT, () => {
     console.log(`Server ready at http://localhost:${PORT}`);
   });
