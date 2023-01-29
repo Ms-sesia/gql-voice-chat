@@ -16,8 +16,17 @@ receiveBtn.style.display = "none";
 let myStream;
 let muted = false;
 let cameraOff = false;
-let roomName = "abc";
+// let roomName = "abc";
 let myPeerConnection;
+
+// roomName생성
+const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+const stringLength = 6;
+let roomName = "";
+for (let i = 0; i < stringLength; i++) {
+  const rnum = Math.floor(Math.random() * chars.length);
+  roomName += chars.substring(rnum, rnum + 1);
+}
 
 initCall();
 
@@ -136,7 +145,13 @@ function makeConnection() {
       },
     ],
   });
+  // icecandidate는 Internet Connectivity Establishment(인터넷 연결 생성)이다.
   myPeerConnection.addEventListener("icecandidate", handleIce);
+
+  // // 룸이름 받아오기
+  // socket.on("getRoomId", (roomId) => {
+  //   roomName = roomId;
+  // });
 
   socket.emit("join_room", roomName);
 
@@ -148,7 +163,13 @@ function makeConnection() {
   });
 }
 
+socket.on("getRoomName", (roomId) => {
+  console.log("roomId:", roomId);
+  roomName = roomId;
+});
+
 function handleIce(data) {
+  console.log(data);
   socket.emit("ice", data.candidate, roomName);
 }
 
