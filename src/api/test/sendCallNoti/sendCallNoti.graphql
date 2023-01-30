@@ -1,3 +1,25 @@
 type Subscription {
-  sendCallNoti: String
+  """
+  전화 알림
+  """
+  sendCallNoti(user_id: Int): sendCallInfo
+}
+
+type sendCallInfo {
+  """
+  수신자 Id
+  """
+  receiverId: Int
+  """
+  수신자 접속 url : www.seqret.co.kr/receive
+  """
+  receiveUrl: String
+  """
+  발신자가 속해있는 roomName
+  """
+  roomName: String
+  """
+  수신자 push 알림에 띄울 메세지
+  """
+  msg: String
 }

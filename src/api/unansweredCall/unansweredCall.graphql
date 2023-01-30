@@ -1,0 +1,16 @@
+type Mutation {
+  """
+  부재중 내역 남기기
+  """
+  unansweredCall(
+    """
+    수신자 Id
+    """
+    receiver_id: Int
+  ): unansweredCallInfo
+}
+
+type unansweredCallInfo {
+  result: Boolean
+  error: String
+}

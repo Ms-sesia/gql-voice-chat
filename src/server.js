@@ -55,7 +55,6 @@ const PORT = process.env.SERVER_PORT;
     cors(),
     json(),
     expressMiddleware(apolloServer, {
-      // context: async ({ request }) => ({ request, isAuthenticated }),
       context: async ({ request }) => ({ request }),
     })
   );
@@ -64,18 +63,6 @@ const PORT = process.env.SERVER_PORT;
   app.use("/public", express.static(path.join(__dirname, "viewFiles", "public")));
 
   app.use(graphqlUploadExpress());
-
-  app.set("view engine", "pug");
-  app.set("views", "./src/viewFiles");
-
-  /* io 전역 설정 */
-  // const io = socketIO(server, { path: "/socket.io" });
-  // app.set("io", io);
-  // app.get("/server", (req, res, next) => socket(req, res, next));
-
-  // 다른 path redirect
-  app.get("/voice", (_, res) => res.render("home"));
-  app.get("/*", (_, res) => res.redirect("/voice"));
 
   await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
   console.log(`Server ready at http://localhost:${PORT}`);

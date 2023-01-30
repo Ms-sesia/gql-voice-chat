@@ -1,7 +1,0 @@
-type Mutation {
-  sendCall(url: String): sendCallInfo
-}
-
-type sendCallInfo {
-  result: Boolean
-}

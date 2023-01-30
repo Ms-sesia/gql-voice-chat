@@ -1,52 +1,15 @@
-// export default {
-//   Query: {
-//     socket: async (_, args, { request }) => {
-//       const io = request.app.get("io");
-//       console.log
-//       io.on("connection", (socket) => {
-//         const userId = socket.id;
-//         console.log(userId);
-//       });
-//     },
-//   },
-// };
-
 import socketIO from "socket.io";
-import genRandomString from "./genRandomString";
 import pubsub from "./pubsub";
 
 export default async (server) => {
-  const io = socketIO(server, { path: "/socket.io" });
+  const io = socketIO(server, { path: "/socket.io", cors: { origin: "*" } });
 
   io.on("connection", (socket) => {
-    // 시리얼이 있으면 발신자. 발신자는 socket.id 사용
-    // const userId = serial ? socket.id : receiverId;
-
-    const userId = socket.id;
-    // console.log(userId);
-
     socket.on("join_room", (roomName) => {
-      console.log("룸에입장하였습니다. roomName:", roomName);
+      console.log("============== 룸에 입장하였습니다. roomName:", roomName);
       socket.join(roomName);
       socket.to(roomName).emit("welcome");
     });
-
-    // call 할 때 noti 전송
-    // const url = `${process.env.VOICE_URL}${roomName}`;
-    // pubsub.publish("sendCall", { sendCallNoti: url });
-
-    
-    // socket.on("join_room", (roomName) => {
-    //   // room이 생성되지 않은 경우
-    //   // room 생성
-    //   const createRoomId = genRandomString();
-    //   // 생성한 룸에 join
-    //   socket.join(createRoomId);
-    //   // 접속자(보통 발신자)에게 roomName 전달
-    //   console.log("접속Id:", userId);
-    //   socket.to(createRoomId).emit("getRoomName", createRoomId);
-    //   console.log("룸에입장하였습니다. roomName:", createRoomId);
-    // });
 
     socket.on("offer", (offer, roomName) => {
       socket.to(roomName).emit("offer", offer);
@@ -58,7 +21,20 @@ export default async (server) => {
       socket.to(roomName).emit("ice", ice);
     });
 
-    socket.on("sendCall", (roomName) => {
+    socket.on("sendCall", ({ roomName, user_id, qr_id }) => {
+      // prisma 통해서 user_id와 qr_id로 QR카드이름 불러오기
+      const receiverCardName = "G80 1158";
+      // call 할 때 noti 전송
+      // const url = `${process.env.VOICE_URL}${roomName}`;
+      pubsub.publish("sendCall", {
+        sendCallNoti: {
+          receiverId: user_id,
+          receiveUrl: process.env.VOICE_URL,
+          roomName,
+          // db통해서 등록한 카드명 불러오기
+          msg: `'${receiverCardName}'에서 걸려오는 전화입니다`,
+        },
+      });
       socket.to(roomName).emit("receiveCall");
     });
 

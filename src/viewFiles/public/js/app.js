@@ -19,6 +19,12 @@ let cameraOff = false;
 // let roomName = "abc";
 let myPeerConnection;
 
+/**
+ * 접속하면 바로 query 전송 getReceiverInfo => user_id 받음
+ */
+// 우선 임의로 지정
+const user_id = 4;
+
 // roomName생성
 const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 const stringLength = 6;
@@ -60,7 +66,7 @@ async function handleCallSend() {
   h3.innerText = "전화 수신 중";
   h1.innerText = "";
 
-  socket.emit("sendCall", roomName);
+  socket.emit("sendCall", { roomName, user_id });
 }
 
 // 수신 종료
